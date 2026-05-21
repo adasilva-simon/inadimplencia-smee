@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Inadimplência — SMEE</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" rx="8" fill="#1e40af"/>
+          <path d="M7 20L12 10l4 7 3-4 5 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>SMEE Finance</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebar-close" aria-label="Fechar menu">&#10005;</button>
+    </div>
+
+    <nav class="nav">
+      <a href="#" class="nav-item active" data-tab="upload">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+        Upload SAP
+      </a>
+      <a href="#" class="nav-item" data-tab="dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item" data-tab="table">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+        Inadimplentes
+      </a>
+      <a href="#" class="nav-item" data-tab="top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Top Devedores
+      </a>
+      <a href="#" class="nav-item" data-tab="map">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+        Por Estado
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="upload-status" id="sidebar-status">
+        <span class="status-dot inactive" id="status-dot"></span>
+        <span id="status-text">Nenhum arquivo</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" id="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="menu-btn" id="menu-btn" aria-label="Abrir menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-title" id="page-title">Upload de Relatório SAP</div>
+      <div class="topbar-actions">
+        <span class="badge-date" id="last-update">—</span>
+        <button class="btn btn-outline" id="export-btn" onclick="exportCSV()" style="display:none">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar CSV
+        </button>
+      </div>
+    </header>
+
+    <!-- SECTIONS -->
+    <div class="content">
+
+      <!-- UPLOAD -->
+      <section id="tab-upload" class="tab-section active">
+        <div class="section-header">
+          <h1>Upload de Relatório SAP</h1>
+          <p>Exporte o relatório de inadimplência (FBL5N ou equivalente) em formato Excel e carregue aqui.</p>
+        </div>
+
+        <div class="upload-zone" id="drop-zone">
+          <input type="file" id="file-input" accept=".xlsx,.xls,.csv" hidden>
+          <div class="upload-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+          </div>
+          <h3>Arraste o arquivo aqui</h3>
+          <p>ou <button class="link-btn" onclick="document.getElementById('file-input').click()">clique para selecionar</button></p>
+          <p class="upload-hint">Suporta .xlsx, .xls — relatório SAP com colunas: Referência, Cliente, Nome 1, Rg, Data doc., Vencim.em, Mont.em MI, Texto</p>
+          <div class="progress-bar" id="progress-bar" style="display:none">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </div>
+
+        <div class="info-card" id="file-info" style="display:none">
+          <div class="info-card-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span id="file-name">—</span>
+          </div>
+          <div class="info-card-body">
+            <div class="info-item"><span class="info-label">Registros</span><span class="info-val" id="info-total">—</span></div>
+            <div class="info-item"><span class="info-label">Positivos</span><span class="info-val" id="info-pos">—</span></div>
+            <div class="info-item"><span class="info-label">Vencidos</span><span class="info-val danger" id="info-venc">—</span></div>
+            <div class="info-item"><span class="info-label">Carregado em</span><span class="info-val" id="info-date">—</span></div>
+          </div>
+        </div>
+
+        <div class="column-map">
+          <h3>Mapeamento de colunas</h3>
+          <table class="map-table">
+            <thead><tr><th>Coluna SAP</th><th>Campo sistema</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Referência</td><td>Nº Documento</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
+              <tr><td>Cliente</td><td>Código do cliente</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
+              <tr><td>Nome 1</td><td>Razão social</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
+              <tr><td>Rg</td><td>Estado/Região</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
+              <tr><td>Data doc.</td><td>Data emissão</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
+              <tr><td>Vencim.em</td><td>Data vencimento</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
+              <tr><td>Mont.em MI</td><td>Valor em aberto (R$)</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
+              <tr><td>Texto</td><td>Observações de cobrança</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- DASHBOARD -->
+      <section id="tab-dashboard" class="tab-section">
+        <div class="section-header">
+          <h1>Dashboard</h1>
+          <p>Visão geral da inadimplência por faixa de atraso e status de cobrança.</p>
+        </div>
+        <div class="metrics-grid" id="metrics-grid"></div>
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-title">Valor em aberto por faixa de atraso</div>
+            <div class="legend" id="bar-legend"></div>
+            <div class="chart-wrap"><canvas id="barChart" role="img" aria-label="Valor por faixa de atraso em dias"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Status de cobrança</div>
+            <div class="chart-wrap"><canvas id="statusChart" role="img" aria-label="Distribuição por status de cobrança"></canvas></div>
+          </div>
+        </div>
+        <div class="chart-card full">
+          <div class="chart-title">Valor vencido por estado (top 8)</div>
+          <div class="chart-wrap tall"><canvas id="stateChart" role="img" aria-label="Valor inadimplente por estado"></canvas></div>
+        </div>
+        <div class="empty-state" id="dash-empty">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <p>Carregue um arquivo na aba <strong>Upload SAP</strong> para ver os gráficos.</p>
+        </div>
+      </section>
+
+      <!-- TABLE -->
+      <section id="tab-table" class="tab-section">
+        <div class="section-header">
+          <h1>Lista de Inadimplentes</h1>
+          <p>Filtre, pesquise e exporte os dados de inadimplência.</p>
+        </div>
+        <div class="filters-row">
+          <input type="text" id="search-input" class="filter-input" placeholder="Buscar por nome ou código..." oninput="applyFilters()">
+          <select id="filter-state" class="filter-select" onchange="applyFilters()"><option value="">Todos os estados</option></select>
+          <select id="filter-range" class="filter-select" onchange="applyFilters()">
+            <option value="">Todas as faixas</option>
+            <option value="0">No prazo</option>
+            <option value="1">1–30 dias</option>
+            <option value="31">31–60 dias</option>
+            <option value="61">61–90 dias</option>
+            <option value="91">91–180 dias</option>
+            <option value="181">+180 dias</option>
+          </select>
+          <select id="filter-status" class="filter-select" onchange="applyFilters()">
+            <option value="">Todos os status</option>
+            <option value="Judicial">Judicial</option>
+            <option value="Terceirizada">Terceirizada</option>
+            <option value="Parcelamento">Parcelamento</option>
+            <option value="Acordo">Acordo</option>
+            <option value="Em aberto">Em aberto</option>
+          </select>
+          <button class="btn btn-primary" onclick="exportCSV()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar CSV
+          </button>
+        </div>
+
+        <div class="table-summary" id="table-summary"></div>
+
+        <div class="table-wrap">
+          <table class="data-table" id="data-table">
+            <thead>
+              <tr>
+                <th onclick="sortBy('cliente')">Cliente <span class="sort-icon">⇅</span></th>
+                <th onclick="sortBy('nome')">Razão Social <span class="sort-icon">⇅</span></th>
+                <th onclick="sortBy('uf')">UF <span class="sort-icon">⇅</span></th>
+                <th>Documento</th>
+                <th onclick="sortBy('venc')">Vencimento <span class="sort-icon">⇅</span></th>
+                <th onclick="sortBy('dias')">Atraso <span class="sort-icon">⇅</span></th>
+                <th onclick="sortBy('valor')">Valor (R$) <span class="sort-icon">⇅</span></th>
+                <th>Status</th>
+                <th>Observação</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination" id="pagination"></div>
+
+        <div class="empty-state" id="table-empty">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+          <p>Carregue um arquivo na aba <strong>Upload SAP</strong> para visualizar os dados.</p>
+        </div>
+      </section>
+
+      <!-- TOP DEVEDORES -->
+      <section id="tab-top" class="tab-section">
+        <div class="section-header">
+          <h1>Top Devedores</h1>
+          <p>Clientes com maior valor total em aberto (apenas valores positivos).</p>
+        </div>
+        <div class="top-filters">
+          <label>Exibir top <select id="top-count" onchange="renderTop()"><option value="10">10</option><option value="20" selected>20</option><option value="30">30</option><option value="50">50</option></select> clientes</label>
+          <label><input type="checkbox" id="top-vencidos-only" onchange="renderTop()"> Somente vencidos</label>
+        </div>
+        <div class="top-list" id="top-list"></div>
+        <div class="empty-state" id="top-empty">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <p>Carregue um arquivo na aba <strong>Upload SAP</strong> para ver os maiores devedores.</p>
+        </div>
+      </section>
+
+      <!-- POR ESTADO -->
+      <section id="tab-map" class="tab-section">
+        <div class="section-header">
+          <h1>Por Estado</h1>
+          <p>Distribuição de inadimplência por unidade federativa.</p>
+        </div>
+        <div class="state-grid" id="state-grid"></div>
+        <div class="empty-state" id="map-empty">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          <p>Carregue um arquivo na aba <strong>Upload SAP</strong> para ver a distribuição por estado.</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
