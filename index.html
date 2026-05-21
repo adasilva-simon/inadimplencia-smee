@@ -406,10 +406,8 @@
 
   <script src="app.js"></script>
   <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      initAuth();
-      addLogoutButton();
-    });
+    // initAuth() em auth.js já chama initApp() e addLogoutButton() quando autenticado
+    window.addEventListener('DOMContentLoaded', () => { initAuth(); });
   </script>
 </body>
 </html>

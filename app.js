@@ -90,36 +90,53 @@ function findCol(row, candidates) {
 
 // ---------- FILE UPLOAD ----------
 function setupUpload() {
-  setupZone('drop-zone-inadimp', 'file-input-inadimp', 'progfill-inadimp',
-            'ustate-inadimp-idle', 'ustate-inadimp-loading', 'ustate-inadimp-done',
-            processInadimp);
-  setupZone('drop-zone-fat', 'file-input-fat', 'progfill-fat',
-            'ustate-fat-idle', 'ustate-fat-loading', 'ustate-fat-done',
-            processFat);
+  bindUploadZone('drop-zone-inadimp', 'file-input-inadimp', 'progfill-inadimp',
+    'ustate-inadimp-idle', 'ustate-inadimp-loading', 'ustate-inadimp-done', processInadimp);
+  bindUploadZone('drop-zone-fat', 'file-input-fat', 'progfill-fat',
+    'ustate-fat-idle', 'ustate-fat-loading', 'ustate-fat-done', processFat);
 }
 
-function setupZone(zoneId, inputId, fillId, idleId, loadId, doneId, handler) {
+// Registra todos os eventos de uma zona de upload
+function bindUploadZone(zoneId, inputId, fillId, idleId, loadId, doneId, handler) {
   const zone  = document.getElementById(zoneId);
   const input = document.getElementById(inputId);
   if (!zone || !input) return;
 
-  zone.addEventListener('click', e => { if (e.target.tagName !== 'BUTTON') input.click(); });
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragging'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('dragging'));
-  zone.addEventListener('drop', e => {
-    e.preventDefault(); zone.classList.remove('dragging');
-    if (e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0], fillId, idleId, loadId, doneId, handler);
+  // Clique na zona abre o seletor de arquivo
+  // Usa mousedown para não conflitar com o change do input
+  zone.addEventListener('mousedown', e => {
+    // Ignora se o clique foi em elemento interativo filho
+    if (['BUTTON','A','INPUT','LABEL'].includes(e.target.tagName)) return;
+    e.preventDefault();
+    input.click();
   });
+
+  // Drag & drop
+  zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('dragging'); });
+  zone.addEventListener('dragleave', e => { if (!zone.contains(e.relatedTarget)) zone.classList.remove('dragging'); });
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragging');
+    const file = e.dataTransfer.files[0];
+    if (file) doReadFile(file, fillId, idleId, loadId, doneId, handler);
+  });
+
+  // Input change — único ponto de entrada para arquivo selecionado via diálogo
   input.addEventListener('change', () => {
-    if (input.files[0]) readFile(input.files[0], fillId, idleId, loadId, doneId, handler);
+    const file = input.files[0];
+    if (!file) return;
+    doReadFile(file, fillId, idleId, loadId, doneId, handler);
+    // Reset para permitir reselecionar o mesmo arquivo
+    input.value = '';
   });
 }
 
-function readFile(file, fillId, idleId, loadId, doneId, handler) {
+// Lê e processa o arquivo
+function doReadFile(file, fillId, idleId, loadId, doneId, handler) {
   const fill = document.getElementById(fillId);
   document.getElementById(idleId).style.display = 'none';
   document.getElementById(loadId).style.display = 'block';
-  document.getElementById(doneId).style.display = 'none';
+  document.getElementById(doneId).style.display  = 'none';
   fill.style.width = '0%';
 
   let pct = 0;
@@ -137,13 +154,19 @@ function readFile(file, fillId, idleId, loadId, doneId, handler) {
         document.getElementById(loadId).style.display = 'none';
         document.getElementById(doneId).style.display = 'block';
         handler(json, file.name);
-      }, 400);
+      }, 350);
     } catch (err) {
       clearInterval(iv);
       document.getElementById(loadId).style.display = 'none';
       document.getElementById(idleId).style.display = 'block';
       alert('Erro ao ler o arquivo: ' + err.message);
     }
+  };
+  reader.onerror = () => {
+    clearInterval(iv);
+    document.getElementById(loadId).style.display = 'none';
+    document.getElementById(idleId).style.display = 'block';
+    alert('Erro ao carregar o arquivo. Tente novamente.');
   };
   reader.readAsArrayBuffer(file);
 }
