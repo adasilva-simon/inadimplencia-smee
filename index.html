@@ -3,10 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controle de Inadimplência — SMEE</title>
+  <title>Controle de Inadimplência — SMEE Finance</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Bibliotecas externas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <!-- Chaves de acesso (edite keys.js para gerenciar usuários) -->
+  <script src="keys.js"></script>
+  <!-- Autenticação -->
+  <script src="auth.js"></script>
 </head>
 <body>
 
@@ -47,7 +52,7 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="upload-status" id="sidebar-status">
+      <div class="upload-status">
         <span class="status-dot inactive" id="status-dot"></span>
         <span id="status-text">Nenhum arquivo</span>
       </div>
@@ -57,7 +62,6 @@
   <!-- MAIN -->
   <main class="main" id="main">
 
-    <!-- TOPBAR -->
     <header class="topbar">
       <button class="menu-btn" id="menu-btn" aria-label="Abrir menu">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -72,7 +76,6 @@
       </div>
     </header>
 
-    <!-- SECTIONS -->
     <div class="content">
 
       <!-- UPLOAD -->
@@ -101,8 +104,8 @@
             <span id="file-name">—</span>
           </div>
           <div class="info-card-body">
-            <div class="info-item"><span class="info-label">Registros</span><span class="info-val" id="info-total">—</span></div>
-            <div class="info-item"><span class="info-label">Positivos</span><span class="info-val" id="info-pos">—</span></div>
+            <div class="info-item"><span class="info-label">Registros totais</span><span class="info-val" id="info-total">—</span></div>
+            <div class="info-item"><span class="info-label">Valores positivos</span><span class="info-val" id="info-pos">—</span></div>
             <div class="info-item"><span class="info-label">Vencidos</span><span class="info-val danger" id="info-venc">—</span></div>
             <div class="info-item"><span class="info-label">Carregado em</span><span class="info-val" id="info-date">—</span></div>
           </div>
@@ -137,16 +140,16 @@
           <div class="chart-card">
             <div class="chart-title">Valor em aberto por faixa de atraso</div>
             <div class="legend" id="bar-legend"></div>
-            <div class="chart-wrap"><canvas id="barChart" role="img" aria-label="Valor por faixa de atraso em dias"></canvas></div>
+            <div class="chart-wrap"><canvas id="barChart" role="img" aria-label="Valor por faixa de atraso"></canvas></div>
           </div>
           <div class="chart-card">
             <div class="chart-title">Status de cobrança</div>
-            <div class="chart-wrap"><canvas id="statusChart" role="img" aria-label="Distribuição por status de cobrança"></canvas></div>
+            <div class="chart-wrap"><canvas id="statusChart" role="img" aria-label="Distribuição por status"></canvas></div>
           </div>
         </div>
         <div class="chart-card full">
           <div class="chart-title">Valor vencido por estado (top 8)</div>
-          <div class="chart-wrap tall"><canvas id="stateChart" role="img" aria-label="Valor inadimplente por estado"></canvas></div>
+          <div class="chart-wrap tall"><canvas id="stateChart" role="img" aria-label="Valor por estado"></canvas></div>
         </div>
         <div class="empty-state" id="dash-empty">
           <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -185,9 +188,7 @@
             Exportar CSV
           </button>
         </div>
-
         <div class="table-summary" id="table-summary"></div>
-
         <div class="table-wrap">
           <table class="data-table" id="data-table">
             <thead>
@@ -206,9 +207,7 @@
             <tbody id="table-body"></tbody>
           </table>
         </div>
-
         <div class="pagination" id="pagination"></div>
-
         <div class="empty-state" id="table-empty">
           <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
           <p>Carregue um arquivo na aba <strong>Upload SAP</strong> para visualizar os dados.</p>
@@ -222,7 +221,15 @@
           <p>Clientes com maior valor total em aberto (apenas valores positivos).</p>
         </div>
         <div class="top-filters">
-          <label>Exibir top <select id="top-count" onchange="renderTop()"><option value="10">10</option><option value="20" selected>20</option><option value="30">30</option><option value="50">50</option></select> clientes</label>
+          <label>Exibir top
+            <select id="top-count" onchange="renderTop()">
+              <option value="10">10</option>
+              <option value="20" selected>20</option>
+              <option value="30">30</option>
+              <option value="50">50</option>
+            </select>
+            clientes
+          </label>
           <label><input type="checkbox" id="top-vencidos-only" onchange="renderTop()"> Somente vencidos</label>
         </div>
         <div class="top-list" id="top-list"></div>
@@ -249,5 +256,13 @@
   </main>
 
   <script src="app.js"></script>
+  <script>
+    // Inicia o fluxo de autenticação.
+    // Após login bem-sucedido, auth.js chama initApp() definido em app.js.
+    window.addEventListener('DOMContentLoaded', () => {
+      initAuth();
+      addLogoutButton();
+    });
+  </script>
 </body>
 </html>

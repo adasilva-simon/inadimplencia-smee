@@ -562,8 +562,9 @@ function escHtml(str) {
 }
 
 // ---------- INIT ----------
-document.addEventListener('DOMContentLoaded', () => {
+// Chamado por auth.js após login bem-sucedido
+function initApp() {
   setupUpload();
   setupNav();
   document.getElementById('last-update').textContent = new Date().toLocaleDateString('pt-BR');
-});
+}
