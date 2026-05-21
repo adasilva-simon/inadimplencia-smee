@@ -502,3 +502,203 @@ body {
   .filters-row { flex-direction: column; align-items: stretch; }
   .filter-input, .filter-select { width: 100%; }
 }
+
+/* ============================================================
+   SMEE Finance v3 — estilos adicionais (faturamento)
+   ============================================================ */
+
+/* Upload groups */
+.upload-group { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); overflow: hidden; }
+.upload-group-label {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px; border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+.upload-group-label strong { font-size: 14px; font-weight: 600; }
+.upload-group-label { flex-wrap: wrap; }
+.upload-group-num {
+  width: 26px; height: 26px; border-radius: 50%; background: var(--color-primary);
+  color: white; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.upload-group-num.opt { background: #94a3b8; }
+.upload-group-sub { font-size: 12px; color: var(--color-muted); display: block; margin-top: 2px; }
+.upload-group .upload-zone { border: none; border-radius: 0; padding: 24px 32px; }
+.upload-result { margin-top: 8px; font-size: 13px; }
+.upload-ok { color: var(--color-success); font-weight: 500; }
+
+/* Section divider */
+.section-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 24px 0 16px; font-size: 13px; font-weight: 600;
+  color: var(--color-muted); text-transform: uppercase; letter-spacing: .06em;
+}
+.section-divider::before,.section-divider::after { content:''; flex:1; height:1px; background: var(--color-border); }
+
+/* Fat cards */
+.fat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 16px; margin-bottom: 20px; }
+.fat-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow); }
+.fat-card-wide { grid-column: 1 / -1; }
+.fat-card-label { font-size: 12px; color: var(--color-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
+.fat-card-bar-wrap { height: 8px; background: var(--color-bg); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+.fat-card-bar { height: 100%; border-radius: 4px; transition: width .6s ease; }
+.fat-card-values { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.fat-pct { font-size: 22px; font-weight: 700; }
+.fat-pct.danger  { color: var(--color-danger); }
+.fat-pct.warning { color: var(--color-warning); }
+.fat-pct.success { color: var(--color-success); }
+.fat-pct.amber   { color: #ea580c; }
+.fat-detail { font-size: 12px; color: var(--color-muted); }
+
+/* Fat alert rows */
+.fat-alert-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid var(--color-border); flex-wrap: wrap; }
+.fat-alert-row:first-of-type { border-top: none; padding-top: 10px; }
+.fat-alert-name { font-size: 13px; font-weight: 500; min-width: 180px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fat-alert-bar-bg { flex: 1; min-width: 60px; height: 6px; background: var(--color-bg); border-radius: 3px; overflow: hidden; }
+.fat-alert-bar { height: 100%; background: var(--color-danger); border-radius: 3px; }
+.fat-alert-pct { font-size: 14px; font-weight: 700; min-width: 52px; text-align: right; }
+.fat-alert-vals { font-size: 11px; color: var(--color-muted); white-space: nowrap; }
+
+/* Highlight metric card */
+.metric-card.highlight-card { border: 2px solid var(--color-primary); }
+.metric-card.metric-muted { opacity: .6; }
+
+/* % badge na tabela */
+.pct-badge { display: inline-block; padding: 2px 7px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+.pct-badge.pct-danger  { background: var(--color-danger-bg);  color: var(--color-danger); }
+.pct-badge.pct-warning { background: var(--color-warning-bg); color: var(--color-warning); }
+.pct-badge.pct-amber   { background: #fff7ed; color: #ea580c; }
+.pct-badge.pct-ok      { background: var(--color-success-bg); color: var(--color-success); }
+
+/* Top devedores — % faturamento */
+.top-pct-wrap { display: flex; flex-direction: column; align-items: center; min-width: 90px; }
+.top-pct-label { font-size: 10px; color: var(--color-muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+
+/* ============================================================
+   SMEE Finance v4 — Upload em abas separadas
+   ============================================================ */
+
+/* Nav divider */
+.nav-divider { height: 1px; background: var(--color-border); margin: 8px 4px; }
+
+/* Nav status badge */
+.nav-status {
+  margin-left: auto; font-size: 11px; font-weight: 700;
+  color: var(--color-success); background: var(--color-success-bg);
+  padding: 1px 6px; border-radius: 10px;
+}
+
+/* Sidebar status duplo */
+.upload-status-row { display: flex; flex-direction: column; gap: 6px; }
+.upload-status-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--color-muted); }
+
+/* Upload page card — zona grande centralizada */
+.upload-page-card {
+  background: var(--color-surface);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius);
+  padding: 56px 32px 48px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  margin-bottom: 20px;
+}
+.upload-page-card:hover { border-color: var(--color-primary); }
+.upload-page-card.dragging { border-color: var(--color-primary); background: var(--color-primary-light); }
+.upload-page-card-opt { border-color: #cbd5e1; }
+.upload-page-card-opt:hover { border-color: #94a3b8; }
+
+.upload-page-icon { color: var(--color-primary); margin-bottom: 18px; }
+.upload-page-icon-opt { color: #94a3b8; }
+
+.upload-page-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+.upload-page-sub { font-size: 14px; color: var(--color-muted); margin-bottom: 6px; }
+.upload-page-hint { font-size: 13px; color: #94a3b8; margin-top: 12px; }
+.upload-optional-label { font-size: 12px; color: #94a3b8; margin-top: 10px; font-style: italic; }
+
+/* Done state */
+.upload-done-icon {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--color-success-bg); color: var(--color-success);
+  font-size: 26px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+}
+.upload-done-icon-opt { background: #f0f9ff; color: #0369a1; }
+
+/* Upload summary */
+.upload-summary {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.summary-item { display: flex; flex-direction: column; gap: 3px; }
+.summary-label { font-size: 11px; color: var(--color-muted); text-transform: uppercase; letter-spacing: .05em; }
+.summary-val { font-size: 17px; font-weight: 700; }
+.summary-val.danger  { color: var(--color-danger); }
+.summary-val.success { color: var(--color-success); }
+
+/* Next step banner */
+.next-step-banner {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--color-primary-light); border: 1px solid #bfdbfe;
+  border-radius: var(--radius-sm); padding: 12px 16px;
+  font-size: 13px; color: #1e3a8a; flex-wrap: wrap;
+}
+.next-step-banner svg { flex-shrink: 0; color: var(--color-primary); }
+.next-step-banner span { flex: 1; }
+.next-step-banner-green { background: var(--color-success-bg); border-color: #bbf7d0; color: #14532d; }
+.next-step-banner-green svg { color: var(--color-success); }
+
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+
+/* Map note */
+.map-note {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: #fffbeb; border: 1px solid #fde68a;
+  border-radius: var(--radius-sm); padding: 10px 14px;
+  font-size: 12px; color: #92400e; margin-top: 14px; line-height: 1.5;
+}
+.map-note svg { flex-shrink: 0; margin-top: 1px; color: #d97706; }
+
+/* Estilos faturamento (já incluídos no v3, reafirmados) */
+.section-divider { display:flex;align-items:center;gap:12px;margin:24px 0 16px;font-size:13px;font-weight:600;color:var(--color-muted);text-transform:uppercase;letter-spacing:.06em; }
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--color-border);}
+.fat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:20px;}
+.fat-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);}
+.fat-card-wide{grid-column:1/-1;}
+.fat-card-label{font-size:12px;color:var(--color-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;}
+.fat-card-bar-wrap{height:8px;background:var(--color-bg);border-radius:4px;overflow:hidden;margin-bottom:8px;}
+.fat-card-bar{height:100%;border-radius:4px;transition:width .6s;}
+.fat-card-values{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.fat-pct{font-size:22px;font-weight:700;}
+.fat-pct.danger{color:var(--color-danger);}
+.fat-pct.warning{color:var(--color-warning);}
+.fat-pct.success{color:var(--color-success);}
+.fat-pct.amber{color:#ea580c;}
+.fat-detail{font-size:12px;color:var(--color-muted);}
+.fat-alert-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--color-border);flex-wrap:wrap;}
+.fat-alert-row:first-of-type{border-top:none;padding-top:10px;}
+.fat-alert-name{font-size:13px;font-weight:500;min-width:180px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.fat-alert-bar-bg{flex:1;min-width:60px;height:6px;background:var(--color-bg);border-radius:3px;overflow:hidden;}
+.fat-alert-bar{height:100%;background:var(--color-danger);border-radius:3px;}
+.fat-alert-pct{font-size:14px;font-weight:700;min-width:52px;text-align:right;}
+.fat-alert-vals{font-size:11px;color:var(--color-muted);white-space:nowrap;}
+.metric-card.highlight-card{border:2px solid var(--color-primary);}
+.metric-card.metric-muted{opacity:.7;}
+.pct-badge{display:inline-block;padding:2px 7px;border-radius:12px;font-size:11px;font-weight:700;}
+.pct-badge.pct-danger{background:var(--color-danger-bg);color:var(--color-danger);}
+.pct-badge.pct-warning{background:var(--color-warning-bg);color:var(--color-warning);}
+.pct-badge.pct-amber{background:#fff7ed;color:#ea580c;}
+.pct-badge.pct-ok{background:var(--color-success-bg);color:var(--color-success);}
+.top-pct-wrap{display:flex;flex-direction:column;align-items:center;min-width:90px;}
+.top-pct-label{font-size:10px;color:var(--color-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}

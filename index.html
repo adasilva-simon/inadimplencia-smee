@@ -5,12 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Controle de Inadimplência — SMEE Finance</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Bibliotecas externas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-  <!-- Chaves de acesso (edite keys.js para gerenciar usuários) -->
   <script src="keys.js"></script>
-  <!-- Autenticação -->
   <script src="auth.js"></script>
 </head>
 <body>
@@ -27,12 +24,18 @@
       </div>
       <button class="sidebar-toggle" id="sidebar-close" aria-label="Fechar menu">&#10005;</button>
     </div>
-
     <nav class="nav">
-      <a href="#" class="nav-item active" data-tab="upload">
+      <a href="#" class="nav-item active" data-tab="upload-inadimp">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
-        Upload SAP
+        Inadimplência
+        <span class="nav-status" id="nav-status-inadimp" style="display:none">✓</span>
       </a>
+      <a href="#" class="nav-item" data-tab="upload-fat">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Faturamento
+        <span class="nav-status" id="nav-status-fat" style="display:none">✓</span>
+      </a>
+      <div class="nav-divider"></div>
       <a href="#" class="nav-item" data-tab="dashboard">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         Dashboard
@@ -50,23 +53,27 @@
         Por Estado
       </a>
     </nav>
-
     <div class="sidebar-footer">
-      <div class="upload-status">
-        <span class="status-dot inactive" id="status-dot"></span>
-        <span id="status-text">Nenhum arquivo</span>
+      <div class="upload-status-row">
+        <div class="upload-status-item">
+          <span class="status-dot inactive" id="status-dot-inadimp"></span>
+          <span id="status-text-inadimp">Inadimplência</span>
+        </div>
+        <div class="upload-status-item">
+          <span class="status-dot inactive" id="status-dot-fat"></span>
+          <span id="status-text-fat">Faturamento</span>
+        </div>
       </div>
     </div>
   </aside>
 
   <!-- MAIN -->
   <main class="main" id="main">
-
     <header class="topbar">
       <button class="menu-btn" id="menu-btn" aria-label="Abrir menu">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <div class="topbar-title" id="page-title">Upload de Relatório SAP</div>
+      <div class="topbar-title" id="page-title">Upload — Inadimplência</div>
       <div class="topbar-actions">
         <span class="badge-date" id="last-update">—</span>
         <button class="btn btn-outline" id="export-btn" onclick="exportCSV()" style="display:none">
@@ -78,64 +85,203 @@
 
     <div class="content">
 
-      <!-- UPLOAD -->
-      <section id="tab-upload" class="tab-section active">
+      <!-- ===================== UPLOAD INADIMPLÊNCIA ===================== -->
+      <section id="tab-upload-inadimp" class="tab-section active">
         <div class="section-header">
-          <h1>Upload de Relatório SAP</h1>
-          <p>Exporte o relatório de inadimplência (FBL5N ou equivalente) em formato Excel e carregue aqui.</p>
+          <h1>Upload — Inadimplência</h1>
+          <p>Carregue aqui o relatório de inadimplência exportado do SAP (transação FBL5N ou equivalente).</p>
         </div>
 
-        <div class="upload-zone" id="drop-zone">
-          <input type="file" id="file-input" accept=".xlsx,.xls,.csv" hidden>
-          <div class="upload-icon">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+        <div class="upload-page-card" id="drop-zone-inadimp">
+          <input type="file" id="file-input-inadimp" accept=".xlsx,.xls,.csv" hidden>
+
+          <div class="upload-page-icon" id="uicon-inadimp">
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+              <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+              <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
+            </svg>
           </div>
-          <h3>Arraste o arquivo aqui</h3>
-          <p>ou <button class="link-btn" onclick="document.getElementById('file-input').click()">clique para selecionar</button></p>
-          <p class="upload-hint">Suporta .xlsx, .xls — relatório SAP com colunas: Referência, Cliente, Nome 1, Rg, Data doc., Vencim.em, Mont.em MI, Texto</p>
-          <div class="progress-bar" id="progress-bar" style="display:none">
-            <div class="progress-fill" id="progress-fill"></div>
+
+          <div id="ustate-inadimp-idle">
+            <h3 class="upload-page-title">Arraste o arquivo aqui</h3>
+            <p class="upload-page-sub">ou <button class="link-btn" onclick="document.getElementById('file-input-inadimp').click()">clique para selecionar</button></p>
+            <p class="upload-page-hint">Formatos aceitos: <strong>.xlsx</strong> · <strong>.xls</strong> · <strong>.csv</strong></p>
+          </div>
+
+          <div id="ustate-inadimp-loading" style="display:none">
+            <h3 class="upload-page-title">Processando arquivo…</h3>
+            <div class="progress-bar" style="max-width:320px;margin:14px auto 0">
+              <div class="progress-fill" id="progfill-inadimp"></div>
+            </div>
+          </div>
+
+          <div id="ustate-inadimp-done" style="display:none">
+            <div class="upload-done-icon">✓</div>
+            <h3 class="upload-page-title" id="utitle-inadimp-done">Arquivo carregado</h3>
+            <p class="upload-page-sub" id="usub-inadimp-done"></p>
+            <button class="btn btn-outline" style="margin-top:14px" onclick="document.getElementById('file-input-inadimp').click()">Substituir arquivo</button>
           </div>
         </div>
 
-        <div class="info-card" id="file-info" style="display:none">
-          <div class="info-card-header">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            <span id="file-name">—</span>
+        <!-- Resumo do arquivo (aparece após upload) -->
+        <div class="upload-summary" id="summary-inadimp" style="display:none">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-label">Arquivo</span>
+              <span class="summary-val" id="sumi-filename">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Total de registros</span>
+              <span class="summary-val" id="sumi-total">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Valores positivos</span>
+              <span class="summary-val" id="sumi-pos">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Parcelas vencidas</span>
+              <span class="summary-val danger" id="sumi-venc">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Total em aberto</span>
+              <span class="summary-val danger" id="sumi-valor">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Carregado em</span>
+              <span class="summary-val" id="sumi-date">—</span>
+            </div>
           </div>
-          <div class="info-card-body">
-            <div class="info-item"><span class="info-label">Registros totais</span><span class="info-val" id="info-total">—</span></div>
-            <div class="info-item"><span class="info-label">Valores positivos</span><span class="info-val" id="info-pos">—</span></div>
-            <div class="info-item"><span class="info-label">Vencidos</span><span class="info-val danger" id="info-venc">—</span></div>
-            <div class="info-item"><span class="info-label">Carregado em</span><span class="info-val" id="info-date">—</span></div>
+
+          <div class="next-step-banner">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>Para análise de <strong>% sobre faturamento</strong>, carregue também o relatório de faturamento na próxima aba.</span>
+            <button class="btn btn-primary btn-sm" onclick="switchTab('upload-fat')">Ir para Faturamento →</button>
           </div>
         </div>
 
-        <div class="column-map">
-          <h3>Mapeamento de colunas</h3>
+        <!-- Mapeamento de colunas -->
+        <div class="column-map" id="colmap-inadimp">
+          <h3>Colunas esperadas do SAP</h3>
           <table class="map-table">
-            <thead><tr><th>Coluna SAP</th><th>Campo sistema</th><th>Status</th></tr></thead>
+            <thead><tr><th>Coluna SAP</th><th>Campo sistema</th><th>Obrigatório</th></tr></thead>
             <tbody>
-              <tr><td>Referência</td><td>Nº Documento</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
-              <tr><td>Cliente</td><td>Código do cliente</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
-              <tr><td>Nome 1</td><td>Razão social</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
-              <tr><td>Rg</td><td>Estado/Região</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
-              <tr><td>Data doc.</td><td>Data emissão</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
-              <tr><td>Vencim.em</td><td>Data vencimento</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
-              <tr><td>Mont.em MI</td><td>Valor em aberto (R$)</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
-              <tr><td>Texto</td><td>Observações de cobrança</td><td><span class="badge badge-green">✓ Detectado</span></td></tr>
+              <tr><td>Referência</td><td>Nº Documento</td><td>—</td></tr>
+              <tr><td>Cliente</td><td>Código do cliente</td><td>—</td></tr>
+              <tr><td>Nome 1</td><td>Razão social</td><td>—</td></tr>
+              <tr><td>Rg</td><td>Estado/Região</td><td>—</td></tr>
+              <tr><td>Data doc.</td><td>Data de emissão</td><td>—</td></tr>
+              <tr><td><strong>Vencim.em</strong></td><td>Data de vencimento</td><td><span class="badge badge-red">✓ obrigatório</span></td></tr>
+              <tr><td><strong>Mont.em MI</strong></td><td>Valor em aberto (R$)</td><td><span class="badge badge-red">✓ obrigatório</span></td></tr>
+              <tr><td>Texto</td><td>Observações de cobrança</td><td>—</td></tr>
             </tbody>
           </table>
         </div>
       </section>
 
-      <!-- DASHBOARD -->
+      <!-- ===================== UPLOAD FATURAMENTO ===================== -->
+      <section id="tab-upload-fat" class="tab-section">
+        <div class="section-header">
+          <h1>Upload — Faturamento</h1>
+          <p>Carregue o relatório de faturamento por cliente. Habilita os indicadores de <strong>% inadimplência sobre faturamento</strong>.</p>
+        </div>
+
+        <div class="upload-page-card upload-page-card-opt" id="drop-zone-fat">
+          <input type="file" id="file-input-fat" accept=".xlsx,.xls,.csv" hidden>
+
+          <div class="upload-page-icon upload-page-icon-opt" id="uicon-fat">
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+          </div>
+
+          <div id="ustate-fat-idle">
+            <h3 class="upload-page-title">Arraste o arquivo aqui</h3>
+            <p class="upload-page-sub">ou <button class="link-btn" onclick="document.getElementById('file-input-fat').click()">clique para selecionar</button></p>
+            <p class="upload-page-hint">Formatos aceitos: <strong>.xlsx</strong> · <strong>.xls</strong> · <strong>.csv</strong></p>
+            <p class="upload-optional-label">Este arquivo é opcional — sem ele o sistema funciona normalmente, sem os indicadores de faturamento.</p>
+          </div>
+
+          <div id="ustate-fat-loading" style="display:none">
+            <h3 class="upload-page-title">Processando arquivo…</h3>
+            <div class="progress-bar" style="max-width:320px;margin:14px auto 0">
+              <div class="progress-fill" id="progfill-fat"></div>
+            </div>
+          </div>
+
+          <div id="ustate-fat-done" style="display:none">
+            <div class="upload-done-icon upload-done-icon-opt">✓</div>
+            <h3 class="upload-page-title" id="utitle-fat-done">Arquivo carregado</h3>
+            <p class="upload-page-sub" id="usub-fat-done"></p>
+            <button class="btn btn-outline" style="margin-top:14px" onclick="document.getElementById('file-input-fat').click()">Substituir arquivo</button>
+          </div>
+        </div>
+
+        <!-- Resumo do arquivo faturamento -->
+        <div class="upload-summary" id="summary-fat" style="display:none">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-label">Arquivo</span>
+              <span class="summary-val" id="sumf-filename">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Período</span>
+              <span class="summary-val" id="sumf-periodo">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Clientes mapeados</span>
+              <span class="summary-val" id="sumf-clientes">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Faturamento total</span>
+              <span class="summary-val success" id="sumf-total">—</span>
+            </div>
+          </div>
+
+          <div class="next-step-banner next-step-banner-green">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Tudo pronto! Acesse o <strong>Dashboard</strong> para ver os indicadores de % sobre faturamento.</span>
+            <button class="btn btn-primary btn-sm" onclick="switchTab('dashboard')">Ver Dashboard →</button>
+          </div>
+        </div>
+
+        <!-- Mapeamento de colunas -->
+        <div class="column-map">
+          <h3>Colunas esperadas do SAP</h3>
+          <table class="map-table">
+            <thead><tr><th>Coluna SAP</th><th>Campo sistema</th><th>Obrigatório</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Cliente</strong></td><td>Código + nome do cliente</td><td><span class="badge badge-red">✓ obrigatório</span></td></tr>
+              <tr><td><strong>FATURAMENTO</strong></td><td>Valor faturado (R$) — coluna 29</td><td><span class="badge badge-red">✓ obrigatório</span></td></tr>
+              <tr><td>Período/ano</td><td>Referência do mês/ano</td><td>—</td></tr>
+            </tbody>
+          </table>
+          <div class="map-note">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            O arquivo de faturamento exportado do SAP tem duas linhas de cabeçalho. O sistema detecta isso automaticamente — exporte normalmente sem alterações.
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== DASHBOARD ===================== -->
       <section id="tab-dashboard" class="tab-section">
         <div class="section-header">
           <h1>Dashboard</h1>
-          <p>Visão geral da inadimplência por faixa de atraso e status de cobrança.</p>
+          <p id="dash-period-label">Visão geral da inadimplência.</p>
         </div>
         <div class="metrics-grid" id="metrics-grid"></div>
+
+        <div id="fat-indicators" style="display:none">
+          <div class="section-divider"><span>Análise sobre Faturamento</span></div>
+          <div class="fat-cards" id="fat-cards"></div>
+          <div class="chart-card full" style="margin-bottom:20px">
+            <div class="chart-title">% inadimplência vs faturamento por cliente (top 15 devedores)</div>
+            <div class="chart-wrap" style="height:320px"><canvas id="clientePctChart" role="img" aria-label="Percentual inadimplência por cliente"></canvas></div>
+          </div>
+        </div>
+
         <div class="charts-row">
           <div class="chart-card">
             <div class="chart-title">Valor em aberto por faixa de atraso</div>
@@ -151,13 +297,15 @@
           <div class="chart-title">Valor vencido por estado (top 8)</div>
           <div class="chart-wrap tall"><canvas id="stateChart" role="img" aria-label="Valor por estado"></canvas></div>
         </div>
+
         <div class="empty-state" id="dash-empty">
           <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          <p>Carregue um arquivo na aba <strong>Upload SAP</strong> para ver os gráficos.</p>
+          <p>Carregue o relatório de inadimplência na aba <strong>Inadimplência</strong> para ver os gráficos.</p>
+          <button class="btn btn-primary" style="margin-top:16px" onclick="switchTab('upload-inadimp')">Ir para Upload →</button>
         </div>
       </section>
 
-      <!-- TABLE -->
+      <!-- ===================== TABLE ===================== -->
       <section id="tab-table" class="tab-section">
         <div class="section-header">
           <h1>Lista de Inadimplentes</h1>
@@ -190,7 +338,7 @@
         </div>
         <div class="table-summary" id="table-summary"></div>
         <div class="table-wrap">
-          <table class="data-table" id="data-table">
+          <table class="data-table">
             <thead>
               <tr>
                 <th onclick="sortBy('cliente')">Cliente <span class="sort-icon">⇅</span></th>
@@ -200,6 +348,7 @@
                 <th onclick="sortBy('venc')">Vencimento <span class="sort-icon">⇅</span></th>
                 <th onclick="sortBy('dias')">Atraso <span class="sort-icon">⇅</span></th>
                 <th onclick="sortBy('valor')">Valor (R$) <span class="sort-icon">⇅</span></th>
+                <th>% Faturado</th>
                 <th>Status</th>
                 <th>Observação</th>
               </tr>
@@ -210,36 +359,35 @@
         <div class="pagination" id="pagination"></div>
         <div class="empty-state" id="table-empty">
           <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
-          <p>Carregue um arquivo na aba <strong>Upload SAP</strong> para visualizar os dados.</p>
+          <p>Carregue o relatório na aba <strong>Inadimplência</strong> para visualizar os dados.</p>
+          <button class="btn btn-primary" style="margin-top:16px" onclick="switchTab('upload-inadimp')">Ir para Upload →</button>
         </div>
       </section>
 
-      <!-- TOP DEVEDORES -->
+      <!-- ===================== TOP DEVEDORES ===================== -->
       <section id="tab-top" class="tab-section">
         <div class="section-header">
           <h1>Top Devedores</h1>
-          <p>Clientes com maior valor total em aberto (apenas valores positivos).</p>
+          <p>Clientes com maior valor total em aberto, com % sobre o faturamento quando disponível.</p>
         </div>
         <div class="top-filters">
           <label>Exibir top
             <select id="top-count" onchange="renderTop()">
-              <option value="10">10</option>
-              <option value="20" selected>20</option>
-              <option value="30">30</option>
-              <option value="50">50</option>
-            </select>
-            clientes
+              <option value="10">10</option><option value="20" selected>20</option>
+              <option value="30">30</option><option value="50">50</option>
+            </select> clientes
           </label>
           <label><input type="checkbox" id="top-vencidos-only" onchange="renderTop()"> Somente vencidos</label>
         </div>
         <div class="top-list" id="top-list"></div>
         <div class="empty-state" id="top-empty">
           <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          <p>Carregue um arquivo na aba <strong>Upload SAP</strong> para ver os maiores devedores.</p>
+          <p>Carregue o relatório na aba <strong>Inadimplência</strong> para ver os maiores devedores.</p>
+          <button class="btn btn-primary" style="margin-top:16px" onclick="switchTab('upload-inadimp')">Ir para Upload →</button>
         </div>
       </section>
 
-      <!-- POR ESTADO -->
+      <!-- ===================== POR ESTADO ===================== -->
       <section id="tab-map" class="tab-section">
         <div class="section-header">
           <h1>Por Estado</h1>
@@ -248,7 +396,8 @@
         <div class="state-grid" id="state-grid"></div>
         <div class="empty-state" id="map-empty">
           <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-          <p>Carregue um arquivo na aba <strong>Upload SAP</strong> para ver a distribuição por estado.</p>
+          <p>Carregue o relatório na aba <strong>Inadimplência</strong> para ver a distribuição por estado.</p>
+          <button class="btn btn-primary" style="margin-top:16px" onclick="switchTab('upload-inadimp')">Ir para Upload →</button>
         </div>
       </section>
 
@@ -257,8 +406,6 @@
 
   <script src="app.js"></script>
   <script>
-    // Inicia o fluxo de autenticação.
-    // Após login bem-sucedido, auth.js chama initApp() definido em app.js.
     window.addEventListener('DOMContentLoaded', () => {
       initAuth();
       addLogoutButton();
