@@ -104,7 +104,7 @@
 
           <div id="ustate-inadimp-idle">
             <h3 class="upload-page-title">Arraste o arquivo aqui</h3>
-            <p class="upload-page-sub">ou <button class="link-btn" onclick="document.getElementById('file-input-inadimp').click()">clique para selecionar</button></p>
+            <p class="upload-page-sub">ou <button class="link-btn" onclick="event.stopPropagation();document.getElementById('file-input-inadimp').click()">clique para selecionar</button></p>
             <p class="upload-page-hint">Formatos aceitos: <strong>.xlsx</strong> · <strong>.xls</strong> · <strong>.csv</strong></p>
           </div>
 
@@ -119,7 +119,7 @@
             <div class="upload-done-icon">✓</div>
             <h3 class="upload-page-title" id="utitle-inadimp-done">Arquivo carregado</h3>
             <p class="upload-page-sub" id="usub-inadimp-done"></p>
-            <button class="btn btn-outline" style="margin-top:14px" onclick="document.getElementById('file-input-inadimp').click()">Substituir arquivo</button>
+            <button class="btn btn-outline" style="margin-top:14px" onclick="event.stopPropagation();document.getElementById('file-input-inadimp').click()">Substituir arquivo</button>
           </div>
         </div>
 
@@ -199,7 +199,7 @@
 
           <div id="ustate-fat-idle">
             <h3 class="upload-page-title">Arraste o arquivo aqui</h3>
-            <p class="upload-page-sub">ou <button class="link-btn" onclick="document.getElementById('file-input-fat').click()">clique para selecionar</button></p>
+            <p class="upload-page-sub">ou <button class="link-btn" onclick="event.stopPropagation();document.getElementById('file-input-fat').click()">clique para selecionar</button></p>
             <p class="upload-page-hint">Formatos aceitos: <strong>.xlsx</strong> · <strong>.xls</strong> · <strong>.csv</strong></p>
             <p class="upload-optional-label">Este arquivo é opcional — sem ele o sistema funciona normalmente, sem os indicadores de faturamento.</p>
           </div>
@@ -215,7 +215,7 @@
             <div class="upload-done-icon upload-done-icon-opt">✓</div>
             <h3 class="upload-page-title" id="utitle-fat-done">Arquivo carregado</h3>
             <p class="upload-page-sub" id="usub-fat-done"></p>
-            <button class="btn btn-outline" style="margin-top:14px" onclick="document.getElementById('file-input-fat').click()">Substituir arquivo</button>
+            <button class="btn btn-outline" style="margin-top:14px" onclick="event.stopPropagation();document.getElementById('file-input-fat').click()">Substituir arquivo</button>
           </div>
         </div>
 

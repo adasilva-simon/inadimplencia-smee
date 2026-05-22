@@ -102,13 +102,14 @@ function bindUploadZone(zoneId, inputId, fillId, idleId, loadId, doneId, handler
   const input = document.getElementById(inputId);
   if (!zone || !input) return;
 
-  // Clique na zona abre o seletor de arquivo
-  // Usa mousedown para não conflitar com o change do input
-  zone.addEventListener('mousedown', e => {
-    // Ignora se o clique foi em elemento interativo filho
+  // Clique na zona dispara o input — usa flag para evitar loop
+  let _opening = false;
+  zone.addEventListener('click', e => {
     if (['BUTTON','A','INPUT','LABEL'].includes(e.target.tagName)) return;
-    e.preventDefault();
+    if (_opening) return;
+    _opening = true;
     input.click();
+    setTimeout(() => { _opening = false; }, 500);
   });
 
   // Drag & drop
@@ -121,13 +122,12 @@ function bindUploadZone(zoneId, inputId, fillId, idleId, loadId, doneId, handler
     if (file) doReadFile(file, fillId, idleId, loadId, doneId, handler);
   });
 
-  // Input change — único ponto de entrada para arquivo selecionado via diálogo
+  // Quando o usuário seleciona um arquivo
   input.addEventListener('change', () => {
     const file = input.files[0];
     if (!file) return;
     doReadFile(file, fillId, idleId, loadId, doneId, handler);
-    // Reset para permitir reselecionar o mesmo arquivo
-    input.value = '';
+    input.value = ''; // permite reselecionar o mesmo arquivo
   });
 }
 
