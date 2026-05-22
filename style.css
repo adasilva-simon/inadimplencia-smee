@@ -702,3 +702,35 @@ body {
 .pct-badge.pct-ok{background:var(--color-success-bg);color:var(--color-success);}
 .top-pct-wrap{display:flex;flex-direction:column;align-items:center;min-width:90px;}
 .top-pct-label{font-size:10px;color:var(--color-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+
+/* ============================================================
+   Upload — label como botão (substitui zona clicável)
+   ============================================================ */
+
+/* Esconde o input nativo mas mantém acessível */
+#file-input-inadimp,
+#file-input-fat {
+  position: absolute;
+  width: 1px; height: 1px;
+  opacity: 0; overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+}
+
+/* Label estilizado como botão de upload */
+.upload-label-btn {
+  display: inline-block;
+  margin: 12px auto 8px;
+  padding: 10px 28px;
+  background: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .15s;
+  user-select: none;
+}
+.upload-label-btn:hover { opacity: .88; }
+.upload-label-btn-opt  { background: #64748b; }
+.upload-label-btn-sm   { font-size: 13px; padding: 7px 20px; margin-top: 12px; }

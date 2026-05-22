@@ -90,83 +90,62 @@ function findCol(row, candidates) {
 
 // ---------- FILE UPLOAD ----------
 function setupUpload() {
-  bindUploadZone('drop-zone-inadimp', 'file-input-inadimp', 'progfill-inadimp',
-    'ustate-inadimp-idle', 'ustate-inadimp-loading', 'ustate-inadimp-done', processInadimp);
-  bindUploadZone('drop-zone-fat', 'file-input-fat', 'progfill-fat',
-    'ustate-fat-idle', 'ustate-fat-loading', 'ustate-fat-done', processFat);
-}
-
-// Registra todos os eventos de uma zona de upload
-function bindUploadZone(zoneId, inputId, fillId, idleId, loadId, doneId, handler) {
-  const zone  = document.getElementById(zoneId);
-  const input = document.getElementById(inputId);
-  if (!zone || !input) return;
-
-  // Clique na zona dispara o input — usa flag para evitar loop
-  let _opening = false;
-  zone.addEventListener('click', e => {
-    if (['BUTTON','A','INPUT','LABEL'].includes(e.target.tagName)) return;
-    if (_opening) return;
-    _opening = true;
-    input.click();
-    setTimeout(() => { _opening = false; }, 500);
+  document.getElementById('file-input-inadimp').addEventListener('change', function() {
+    if (this.files && this.files[0]) processFile(this.files[0], 'inadimp');
   });
-
-  // Drag & drop
-  zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('dragging'); });
-  zone.addEventListener('dragleave', e => { if (!zone.contains(e.relatedTarget)) zone.classList.remove('dragging'); });
-  zone.addEventListener('drop', e => {
-    e.preventDefault();
-    zone.classList.remove('dragging');
-    const file = e.dataTransfer.files[0];
-    if (file) doReadFile(file, fillId, idleId, loadId, doneId, handler);
-  });
-
-  // Quando o usuário seleciona um arquivo
-  input.addEventListener('change', () => {
-    const file = input.files[0];
-    if (!file) return;
-    doReadFile(file, fillId, idleId, loadId, doneId, handler);
-    input.value = ''; // permite reselecionar o mesmo arquivo
+  document.getElementById('file-input-fat').addEventListener('change', function() {
+    if (this.files && this.files[0]) processFile(this.files[0], 'fat');
   });
 }
 
-// Lê e processa o arquivo
-function doReadFile(file, fillId, idleId, loadId, doneId, handler) {
-  const fill = document.getElementById(fillId);
+function processFile(file, tipo) {
+  const idleId = 'ustate-' + tipo + '-idle';
+  const loadId = 'ustate-' + tipo + '-loading';
+  const doneId = 'ustate-' + tipo + '-done';
+  const fillId = 'progfill-' + tipo;
+
   document.getElementById(idleId).style.display = 'none';
   document.getElementById(loadId).style.display = 'block';
-  document.getElementById(doneId).style.display  = 'none';
-  fill.style.width = '0%';
+  document.getElementById(doneId).style.display = 'none';
 
+  const fill = document.getElementById(fillId);
   let pct = 0;
-  const iv = setInterval(() => { pct = Math.min(pct + 12, 88); fill.style.width = pct + '%'; }, 60);
+  const iv = setInterval(() => {
+    pct = Math.min(pct + 15, 85);
+    fill.style.width = pct + '%';
+  }, 80);
 
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = function(e) {
     try {
       const wb   = XLSX.read(new Uint8Array(e.target.result), { type: 'array', cellDates: true });
       const ws   = wb.Sheets[wb.SheetNames[0]];
       const json = XLSX.utils.sheet_to_json(ws, { raw: false, defval: '' });
+
       clearInterval(iv);
       fill.style.width = '100%';
-      setTimeout(() => {
+
+      setTimeout(function() {
         document.getElementById(loadId).style.display = 'none';
         document.getElementById(doneId).style.display = 'block';
-        handler(json, file.name);
-      }, 350);
-    } catch (err) {
+        if (tipo === 'inadimp') processInadimp(json, file.name);
+        else                    processFat(json, file.name);
+      }, 300);
+
+    } catch(err) {
       clearInterval(iv);
       document.getElementById(loadId).style.display = 'none';
       document.getElementById(idleId).style.display = 'block';
-      alert('Erro ao ler o arquivo: ' + err.message);
+      fill.style.width = '0%';
+      alert('Erro ao processar o arquivo: ' + err.message);
     }
   };
-  reader.onerror = () => {
+  reader.onerror = function() {
     clearInterval(iv);
     document.getElementById(loadId).style.display = 'none';
     document.getElementById(idleId).style.display = 'block';
-    alert('Erro ao carregar o arquivo. Tente novamente.');
+    fill.style.width = '0%';
+    alert('Erro ao ler o arquivo. Tente novamente.');
   };
   reader.readAsArrayBuffer(file);
 }

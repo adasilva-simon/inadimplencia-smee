@@ -92,10 +92,9 @@
           <p>Carregue aqui o relatório de inadimplência exportado do SAP (transação FBL5N ou equivalente).</p>
         </div>
 
-        <div class="upload-page-card" id="drop-zone-inadimp">
-          <input type="file" id="file-input-inadimp" accept=".xlsx,.xls,.csv" hidden>
+        <div class="upload-page-card">
 
-          <div class="upload-page-icon" id="uicon-inadimp">
+          <div class="upload-page-icon">
             <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
               <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
               <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
@@ -103,8 +102,11 @@
           </div>
 
           <div id="ustate-inadimp-idle">
-            <h3 class="upload-page-title">Arraste o arquivo aqui</h3>
-            <p class="upload-page-sub">ou <button class="link-btn" onclick="event.stopPropagation();document.getElementById('file-input-inadimp').click()">clique para selecionar</button></p>
+            <h3 class="upload-page-title">Selecione o arquivo</h3>
+            <label class="upload-label-btn" for="file-input-inadimp">
+              Clique aqui para escolher o arquivo
+            </label>
+            <input type="file" id="file-input-inadimp" accept=".xlsx,.xls,.csv">
             <p class="upload-page-hint">Formatos aceitos: <strong>.xlsx</strong> · <strong>.xls</strong> · <strong>.csv</strong></p>
           </div>
 
@@ -119,7 +121,9 @@
             <div class="upload-done-icon">✓</div>
             <h3 class="upload-page-title" id="utitle-inadimp-done">Arquivo carregado</h3>
             <p class="upload-page-sub" id="usub-inadimp-done"></p>
-            <button class="btn btn-outline" style="margin-top:14px" onclick="event.stopPropagation();document.getElementById('file-input-inadimp').click()">Substituir arquivo</button>
+            <label class="upload-label-btn upload-label-btn-sm" for="file-input-inadimp">
+              Substituir arquivo
+            </label>
           </div>
         </div>
 
@@ -185,10 +189,9 @@
           <p>Carregue o relatório de faturamento por cliente. Habilita os indicadores de <strong>% inadimplência sobre faturamento</strong>.</p>
         </div>
 
-        <div class="upload-page-card upload-page-card-opt" id="drop-zone-fat">
-          <input type="file" id="file-input-fat" accept=".xlsx,.xls,.csv" hidden>
+        <div class="upload-page-card upload-page-card-opt">
 
-          <div class="upload-page-icon upload-page-icon-opt" id="uicon-fat">
+          <div class="upload-page-icon upload-page-icon-opt">
             <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
               <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
@@ -198,8 +201,11 @@
           </div>
 
           <div id="ustate-fat-idle">
-            <h3 class="upload-page-title">Arraste o arquivo aqui</h3>
-            <p class="upload-page-sub">ou <button class="link-btn" onclick="event.stopPropagation();document.getElementById('file-input-fat').click()">clique para selecionar</button></p>
+            <h3 class="upload-page-title">Selecione o arquivo</h3>
+            <label class="upload-label-btn upload-label-btn-opt" for="file-input-fat">
+              Clique aqui para escolher o arquivo
+            </label>
+            <input type="file" id="file-input-fat" accept=".xlsx,.xls,.csv">
             <p class="upload-page-hint">Formatos aceitos: <strong>.xlsx</strong> · <strong>.xls</strong> · <strong>.csv</strong></p>
             <p class="upload-optional-label">Este arquivo é opcional — sem ele o sistema funciona normalmente, sem os indicadores de faturamento.</p>
           </div>
@@ -215,7 +221,9 @@
             <div class="upload-done-icon upload-done-icon-opt">✓</div>
             <h3 class="upload-page-title" id="utitle-fat-done">Arquivo carregado</h3>
             <p class="upload-page-sub" id="usub-fat-done"></p>
-            <button class="btn btn-outline" style="margin-top:14px" onclick="event.stopPropagation();document.getElementById('file-input-fat').click()">Substituir arquivo</button>
+            <label class="upload-label-btn upload-label-btn-sm upload-label-btn-opt" for="file-input-fat">
+              Substituir arquivo
+            </label>
           </div>
         </div>
 
