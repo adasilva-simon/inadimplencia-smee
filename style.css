@@ -816,3 +816,43 @@ body {
 }
 .fat-empty-msg svg { margin: 0 auto 12px; display: block; opacity: .3; }
 .fat-empty-msg p { font-size: 14px; }
+
+/* ============================================================
+   Por Estado — card clicável e painel de detalhe
+   ============================================================ */
+.state-card {
+  cursor: pointer;
+  transition: box-shadow .15s, border-color .15s;
+}
+.state-card:hover { box-shadow: var(--shadow-md); border-color: #93c5fd; }
+.state-card-active { border-color: var(--color-primary) !important; box-shadow: 0 0 0 3px var(--color-primary-light) !important; }
+
+.state-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+.state-detail-hint { font-size: 11px; color: var(--color-primary); font-weight: 500; opacity: .7; }
+.state-card:hover .state-detail-hint { opacity: 1; }
+
+/* Painel de detalhe */
+.state-detail-panel {
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+.state-detail-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--color-primary-light);
+  border-bottom: 1px solid #bfdbfe;
+  flex-wrap: wrap; gap: 10px;
+}
+.state-detail-title { font-size: 15px; font-weight: 700; color: var(--color-primary); }
+.state-detail-total { font-size: 13px; color: #1e3a8a; margin-top: 2px; }
+.state-detail-close {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: var(--radius-sm);
+  border: 1px solid #93c5fd; background: white;
+  color: var(--color-primary); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: background .15s;
+}
+.state-detail-close:hover { background: #eff6ff; }

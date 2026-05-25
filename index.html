@@ -368,6 +368,39 @@
           <p>Distribuição de inadimplência por unidade federativa.</p>
         </div>
         <div class="state-grid" id="state-grid"></div>
+
+        <!-- Painel de clientes por estado -->
+        <div id="state-detail" style="display:none;margin-top:24px">
+          <div class="state-detail-panel">
+            <div class="state-detail-header">
+              <div>
+                <h3 class="state-detail-title" id="state-detail-title">Clientes</h3>
+                <p class="state-detail-total" id="state-detail-total"></p>
+              </div>
+              <button class="state-detail-close" onclick="document.getElementById('state-detail').style.display='none';document.querySelectorAll('.state-card').forEach(function(c){c.classList.remove('state-card-active');})">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Fechar
+              </button>
+            </div>
+            <div class="table-wrap" style="max-height:380px">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Razão Social</th>
+                    <th>Parcelas</th>
+                    <th>Vencido (R$)</th>
+                    <th>Total aberto (R$)</th>
+                    <th>Maior atraso</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="state-detail-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <div class="empty-state" id="map-empty">
           <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
           <p>Carregue o relatório na aba <strong>Inadimplência</strong> para ver a distribuição por estado.</p>
@@ -1018,8 +1051,11 @@ function renderTop() {
 // POR ESTADO
 function renderStateView() {
   var empty=document.getElementById('map-empty'),grid=document.getElementById('state-grid');
-  if(!state.rows.length){empty.style.display='block';grid.innerHTML='';return;}
+  var detail=document.getElementById('state-detail');
+  if(!state.rows.length){empty.style.display='block';grid.innerHTML='';detail.style.display='none';return;}
   empty.style.display='none';
+  detail.style.display='none';
+
   var by={};
   state.rows.forEach(function(r){
     if(!by[r.uf])by[r.uf]={total:0,vencido:0,count:0,clientes:{}};
@@ -1032,8 +1068,11 @@ function renderStateView() {
   sorted.forEach(function(entry){
     var uf=entry[0],d=entry[1];
     var nc=Object.keys(d.clientes).length;
-    html+='<div class="state-card">'
+    html+='<div class="state-card" data-uf="'+escHtml(uf)+'" title="Clique para ver clientes">'
+        +'<div class="state-card-header">'
         +'<div class="state-code">'+escHtml(uf)+'</div>'
+        +'<span class="state-detail-hint">ver clientes ›</span>'
+        +'</div>'
         +'<div style="font-size:12px;color:#64748b">'+nc+' clientes · '+d.count+' parcelas</div>'
         +'<div class="state-total">'+fmtBRL(d.vencido)+'</div>'
         +'<div class="state-count">Total em aberto: '+fmtBRL(d.total)+'</div>'
@@ -1041,6 +1080,65 @@ function renderStateView() {
         +'</div>';
   });
   grid.innerHTML=html;
+
+  // Adiciona click em cada card
+  grid.querySelectorAll('.state-card').forEach(function(card){
+    card.addEventListener('click', function(){
+      showStateDetail(card.getAttribute('data-uf'));
+    });
+  });
+}
+
+function showStateDetail(uf) {
+  var detail = document.getElementById('state-detail');
+  var title  = document.getElementById('state-detail-title');
+  var tbody  = document.getElementById('state-detail-body');
+  var totEl  = document.getElementById('state-detail-total');
+
+  // Destaca o card selecionado
+  document.querySelectorAll('.state-card').forEach(function(c){
+    c.classList.toggle('state-card-active', c.querySelector('.state-code').textContent===uf);
+  });
+
+  // Agrupa por cliente
+  var byClient = {};
+  state.rows.filter(function(r){return r.uf===uf;}).forEach(function(r){
+    if(!byClient[r.cliente]) byClient[r.cliente]={nome:r.nome,total:0,vencido:0,maxDias:0,count:0,status:r.status};
+    byClient[r.cliente].total  += r.valor;
+    byClient[r.cliente].count  += 1;
+    if(r.dias>0) byClient[r.cliente].vencido += r.valor;
+    if(r.dias>byClient[r.cliente].maxDias) {
+      byClient[r.cliente].maxDias = r.dias;
+      byClient[r.cliente].status  = r.status;
+    }
+  });
+
+  var clientes = Object.entries(byClient).sort(function(a,b){return b[1].vencido-a[1].vencido;});
+  var totalVenc = clientes.reduce(function(s,e){return s+e[1].vencido;},0);
+  var totalAbert = clientes.reduce(function(s,e){return s+e[1].total;},0);
+
+  title.textContent = 'Clientes inadimplentes — '+uf+' ('+clientes.length+')';
+  totEl.textContent = 'Vencido: '+fmtBRL(totalVenc)+' · Total em aberto: '+fmtBRL(totalAbert);
+
+  var rows = '';
+  clientes.forEach(function(entry){
+    var cod=entry[0], d=entry[1];
+    var faixa = faixaAtraso(d.maxDias);
+    var diasTxt = d.maxDias>0 ? d.maxDias+'d' : 'No prazo';
+    rows += '<tr>'
+          + '<td>'+escHtml(cod)+'</td>'
+          + '<td class="td-name" title="'+escHtml(d.nome)+'">'+escHtml(d.nome)+'</td>'
+          + '<td>'+d.count+'</td>'
+          + '<td class="td-val" style="color:'+(d.vencido>0?'#dc2626':'inherit')+'">'+fmtBRL(d.vencido)+'</td>'
+          + '<td class="td-val">'+fmtBRL(d.total)+'</td>'
+          + '<td><span class="badge '+faixa.cls+'">'+diasTxt+'</span></td>'
+          + '<td><span class="badge '+d.status.cls+'">'+d.status.label+'</span></td>'
+          + '</tr>';
+  });
+  tbody.innerHTML = rows || '<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:20px">Nenhum registro vencido</td></tr>';
+
+  detail.style.display = 'block';
+  detail.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 // EXPORT
