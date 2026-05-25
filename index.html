@@ -412,7 +412,7 @@ TODAY.setHours(0,0,0,0);
 
 const daysBetween = d => Math.floor((TODAY-(d instanceof Date?d:new Date(d)))/86400000);
 const fmtBRL = v => 'R\u00a0'+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-const fmtPct = v => v.toFixed(1).replace('.',','+'%');
+const fmtPct = v => v.toFixed(1).replace('.',',')+'%';
 const fmtDate = v => { if(!v) return '—'; const d=v instanceof Date?v:new Date(v); return isNaN(d)?'—':d.toLocaleDateString('pt-BR'); };
 const escHtml = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
@@ -865,6 +865,73 @@ function renderFatIndicators(totalVenc, criticos, rows) {
     });
     alertHtml += '</div>';
   }
+
+  // Gráfico % por cliente (top 15 por valor inadimplente)
+  var topClientes = [];
+  Object.keys(inadByClient).forEach(function(cod) {
+    var inad = inadByClient[cod];
+    var nome = '';
+    for(var i=0;i<rows.length;i++){if(rows[i].cliente===cod){nome=rows[i].nome;break;}}
+    topClientes.push({cod:cod, nome:nome||cod, inad:inad});
+  });
+  topClientes.sort(function(a,b){return b.inad-a.inad;});
+  topClientes = topClientes.slice(0,15);
+
+  var chartLabels = topClientes.map(function(c){
+    return c.nome.length>18 ? c.nome.substring(0,18)+'…' : c.nome;
+  });
+  var chartInad = topClientes.map(function(c){return Math.round(c.inad);});
+  var chartPct  = topClientes.map(function(c){
+    return fat>0 ? parseFloat((c.inad/fat*100).toFixed(1)) : 0;
+  });
+
+  buildChart('clientePctChart', {
+    type: 'bar',
+    data: {
+      labels: chartLabels,
+      datasets: [
+        {
+          label: 'Valor inadimplente (R$)',
+          data: chartInad,
+          backgroundColor: '#1e40af',
+          borderRadius: 4,
+          yAxisID: 'y'
+        },
+        {
+          label: '% sobre faturamento informado',
+          data: chartPct,
+          type: 'line',
+          borderColor: '#dc2626',
+          backgroundColor: 'rgba(220,38,38,0.1)',
+          borderWidth: 2,
+          pointRadius: 4,
+          yAxisID: 'y1',
+          tension: 0.3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {position:'top', labels:{font:{size:11}, boxWidth:12}},
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              return ctx.datasetIndex===0
+                ? 'Inadimplência: '+fmtBRL(ctx.raw)
+                : '% fat.: '+ctx.raw+'%';
+            }
+          }
+        }
+      },
+      scales: {
+        x: {ticks:{font:{size:10}, maxRotation:40}},
+        y:  {position:'left',  ticks:{callback:function(v){return 'R$'+Math.round(v/1000)+'k';}}},
+        y1: {position:'right', ticks:{callback:function(v){return v+'%';}}, grid:{drawOnChartArea:false}}
+      }
+    }
+  });
 
   document.getElementById('fat-cards').innerHTML =
     '<div class="fat-card">'
