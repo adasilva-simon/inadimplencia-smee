@@ -180,94 +180,62 @@
         </div>
       </section>
 
-      <!-- ===================== UPLOAD FATURAMENTO ===================== -->
+      <!-- ===================== FATURAMENTO MANUAL ===================== -->
       <section id="tab-upload-fat" class="tab-section">
         <div class="section-header">
-          <h1>Upload — Faturamento</h1>
-          <p>Carregue o relatório de faturamento por cliente. Habilita os indicadores de <strong>% inadimplência sobre faturamento</strong>.</p>
+          <h1>Faturamento</h1>
+          <p>Digite os valores de faturamento para calcular os indicadores de inadimplência.</p>
         </div>
 
-        <div class="upload-page-card upload-page-card-opt">
+        <div class="fat-form-card">
+          <div class="fat-form-row">
+            <div class="fat-form-group">
+              <label class="fat-form-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Faturamento do Mês (R$)
+              </label>
+              <div class="fat-input-wrap">
+                <span class="fat-input-prefix">R$</span>
+                <input type="text" id="fat-mes-input" class="fat-input" placeholder="0,00"
+                  oninput="formatFatInput(this)" onchange="calcFaturamento()">
+              </div>
+              <p class="fat-form-hint">Faturamento total do mês de referência do relatório</p>
+            </div>
 
-          <div class="upload-page-icon upload-page-icon-opt">
-            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
-              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-            </svg>
-          </div>
-
-          <div id="ustate-fat-idle">
-            <h3 class="upload-page-title">Selecione o arquivo</h3>
-            <label class="upload-label-btn upload-label-btn-opt" for="file-input-fat">
-              Clique aqui para escolher o arquivo
-            </label>
-            <input type="file" id="file-input-fat" accept=".xlsx,.xls,.csv">
-            <p class="upload-page-hint">Formatos aceitos: <strong>.xlsx</strong> · <strong>.xls</strong> · <strong>.csv</strong></p>
-            <p class="upload-optional-label">Este arquivo é opcional — sem ele o sistema funciona normalmente, sem os indicadores de faturamento.</p>
-          </div>
-
-          <div id="ustate-fat-loading" style="display:none">
-            <h3 class="upload-page-title">Processando arquivo…</h3>
-            <div class="progress-bar" style="max-width:320px;margin:14px auto 0">
-              <div class="progress-fill" id="progfill-fat"></div>
+            <div class="fat-form-group">
+              <label class="fat-form-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Faturamento Acumulado do Ano (R$)
+              </label>
+              <div class="fat-input-wrap">
+                <span class="fat-input-prefix">R$</span>
+                <input type="text" id="fat-acum-input" class="fat-input" placeholder="0,00"
+                  oninput="formatFatInput(this)" onchange="calcFaturamento()">
+              </div>
+              <p class="fat-form-hint">Soma do faturamento de janeiro até o mês atual</p>
             </div>
           </div>
 
-          <div id="ustate-fat-done" style="display:none">
-            <div class="upload-done-icon upload-done-icon-opt">✓</div>
-            <h3 class="upload-page-title" id="utitle-fat-done">Arquivo carregado</h3>
-            <p class="upload-page-sub" id="usub-fat-done"></p>
-            <label class="upload-label-btn upload-label-btn-sm upload-label-btn-opt" for="file-input-fat">
-              Substituir arquivo
-            </label>
-          </div>
+          <button class="fat-calc-btn" onclick="calcFaturamento()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Aplicar valores
+          </button>
         </div>
 
-        <!-- Resumo do arquivo faturamento -->
-        <div class="upload-summary" id="summary-fat" style="display:none">
-          <div class="summary-grid">
-            <div class="summary-item">
-              <span class="summary-label">Arquivo</span>
-              <span class="summary-val" id="sumf-filename">—</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-label">Período</span>
-              <span class="summary-val" id="sumf-periodo">—</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-label">Clientes mapeados</span>
-              <span class="summary-val" id="sumf-clientes">—</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-label">Faturamento total</span>
-              <span class="summary-val success" id="sumf-total">—</span>
-            </div>
-          </div>
-
-          <div class="next-step-banner next-step-banner-green">
+        <!-- Preview dos indicadores -->
+        <div class="fat-preview" id="fat-preview" style="display:none">
+          <div class="section-divider"><span>Prévia dos Indicadores</span></div>
+          <div class="fat-preview-grid" id="fat-preview-grid"></div>
+          <div class="next-step-banner next-step-banner-green" style="margin-top:16px">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>Tudo pronto! Acesse o <strong>Dashboard</strong> para ver os indicadores de % sobre faturamento.</span>
+            <span>Valores aplicados! Acesse o <strong>Dashboard</strong> para ver todos os indicadores.</span>
             <button class="btn btn-primary btn-sm" onclick="switchTab('dashboard')">Ver Dashboard →</button>
           </div>
         </div>
 
-        <!-- Mapeamento de colunas -->
-        <div class="column-map">
-          <h3>Colunas esperadas do SAP</h3>
-          <table class="map-table">
-            <thead><tr><th>Coluna SAP</th><th>Campo sistema</th><th>Obrigatório</th></tr></thead>
-            <tbody>
-              <tr><td><strong>Cliente</strong></td><td>Código + nome do cliente</td><td><span class="badge badge-red">✓ obrigatório</span></td></tr>
-              <tr><td><strong>FATURAMENTO</strong></td><td>Valor faturado (R$) — coluna 29</td><td><span class="badge badge-red">✓ obrigatório</span></td></tr>
-              <tr><td>Período/ano</td><td>Referência do mês/ano</td><td>—</td></tr>
-            </tbody>
-          </table>
-          <div class="map-note">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            O arquivo de faturamento exportado do SAP tem duas linhas de cabeçalho. O sistema detecta isso automaticamente — exporte normalmente sem alterações.
-          </div>
+        <div class="fat-empty-msg" id="fat-empty-msg">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p>Carregue primeiro o relatório de inadimplência para ver a prévia dos indicadores.</p>
         </div>
       </section>
 
@@ -438,7 +406,8 @@ window.SMEE_KEYS = ACCESS_KEYS;
 
 const state = {
   rows: [], filtered: [],
-  fatMap: {}, fatTotal: 0, fatPeriodo: '',
+  fatMes: 0,   // faturamento do mês digitado
+  fatAcum: 0,  // faturamento acumulado digitado
   sortCol: 'dias', sortDir: -1,
   page: 0, perPage: 20,
   charts: {}
@@ -525,9 +494,6 @@ function setupUpload() {
   document.getElementById('file-input-inadimp').addEventListener('change', function() {
     if (this.files && this.files[0]) processFile(this.files[0], 'inadimp');
   });
-  document.getElementById('file-input-fat').addEventListener('change', function() {
-    if (this.files && this.files[0]) processFile(this.files[0], 'fat');
-  });
 }
 
 function processFile(file, tipo) {
@@ -560,8 +526,7 @@ function processFile(file, tipo) {
       setTimeout(function() {
         document.getElementById(loadId).style.display = 'none';
         document.getElementById(doneId).style.display = 'block';
-        if (tipo === 'inadimp') processInadimp(json, file.name);
-        else                    processFat(json, file.name);
+        processInadimp(json, file.name);
       }, 300);
 
     } catch(err) {
@@ -581,6 +546,89 @@ function processFile(file, tipo) {
   };
   reader.readAsArrayBuffer(file);
 }
+
+// ---------- FATURAMENTO MANUAL ----------
+function parseFatValue(id) {
+  const raw = (document.getElementById(id).value || '').replace(/\./g,'').replace(',','.');
+  const v = parseFloat(raw);
+  return isNaN(v) ? 0 : v;
+}
+
+function formatFatInput(input) {
+  // Remove tudo que não é dígito
+  let raw = input.value.replace(/\D/g, '');
+  if (!raw) { input.value = ''; return; }
+  // Formata como moeda brasileira
+  let num = parseInt(raw, 10) / 100;
+  input.value = num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function calcFaturamento() {
+  const mes  = parseFatValue('fat-mes-input');
+  const acum = parseFatValue('fat-acum-input');
+
+  state.fatMes  = mes;
+  state.fatAcum = acum;
+
+  const preview = document.getElementById('fat-preview');
+  const emptyMsg = document.getElementById('fat-empty-msg');
+  const grid = document.getElementById('fat-preview-grid');
+
+  if (!mes && !acum) return;
+
+  // Mostra prévia só se já tem dados de inadimplência
+  if (!state.rows.length) {
+    if (emptyMsg) emptyMsg.style.display = 'block';
+    preview.style.display = 'none';
+    return;
+  }
+
+  if (emptyMsg) emptyMsg.style.display = 'none';
+  preview.style.display = 'block';
+
+  const totalVenc = state.rows.filter(r => r.dias > 0).reduce((s,r) => s+r.valor, 0);
+  const totalAbert = state.rows.reduce((s,r) => s+r.valor, 0);
+
+  let cards = '';
+  if (mes > 0) {
+    const pct = totalVenc / mes * 100;
+    cards += previewCard('Inadimpl. ÷ Fat. do Mês', pct, totalVenc, mes);
+  }
+  if (acum > 0) {
+    const pct = totalVenc / acum * 100;
+    cards += previewCard('Inadimpl. ÷ Fat. Acumulado', pct, totalVenc, acum);
+  }
+  if (mes > 0) {
+    const pct = totalAbert / mes * 100;
+    cards += previewCard('Total em Aberto ÷ Fat. do Mês', pct, totalAbert, mes);
+  }
+  if (acum > 0) {
+    const pct = totalAbert / acum * 100;
+    cards += previewCard('Total em Aberto ÷ Fat. Acumulado', pct, totalAbert, acum);
+  }
+  grid.innerHTML = cards;
+
+  // Atualiza badge na sidebar
+  document.getElementById('status-dot-fat').className  = 'status-dot active';
+  document.getElementById('status-text-fat').textContent = 'Faturamento aplicado';
+  document.getElementById('nav-status-fat').style.display = 'inline';
+}
+
+function previewCard(label, pct, inad, fat) {
+  const cls = pct >= 10 ? 'danger' : pct >= 5 ? 'warning' : 'success';
+  const color = pct >= 10 ? '#dc2626' : pct >= 5 ? '#d97706' : '#16a34a';
+  return \`<div class="fat-prev-card">
+    <div class="fat-form-label" style="margin-bottom:10px">\${label}</div>
+    <div class="fat-card-bar-wrap">
+      <div class="fat-card-bar" style="width:\${Math.min(pct,100)}%;background:\${color}"></div>
+    </div>
+    <div class="fat-card-values">
+      <span class="fat-pct \${cls}">\${fmtPct(pct)}</span>
+      <span class="fat-detail">\${fmtBRL(inad)} de \${fmtBRL(fat)}</span>
+    </div>
+  </div>\`;
+}
+
 
 // ---------- PROCESSA INADIMPLÊNCIA ----------
 function processInadimp(json, filename) {
@@ -634,52 +682,6 @@ function processInadimp(json, filename) {
   populateStateFilter();
 }
 
-// ---------- PROCESSA FATURAMENTO ----------
-function processFat(json, filename) {
-  const header     = json[0];
-  const keys       = Object.keys(header);
-  let clienteKey   = null, fatKey = null, periodoKey = null;
-
-  for (const [k, v] of Object.entries(header)) {
-    const s = String(v || '').trim().toUpperCase();
-    if (s === 'CLIENTE')                                clienteKey = k;
-    if (s === 'FATURAMENTO')                            fatKey     = k;
-    if (s === 'PERÍODO/ANO' || s === 'PERIODO/ANO')    periodoKey = k;
-  }
-  if (!clienteKey) clienteKey = keys[18];
-  if (!fatKey)     fatKey     = keys[29];
-  if (!periodoKey) periodoKey = keys[20];
-
-  const fatMap = {};
-  let fatTotal = 0, periodo = '';
-
-  for (let i = 1; i < json.length; i++) {
-    const row = json[i];
-    const cod = extractClientCode(row[clienteKey]);
-    if (!cod) continue;
-    const val = parseFloat(String(row[fatKey] || '0').replace(',', '.'));
-    if (isNaN(val)) continue;
-    fatMap[cod] = (fatMap[cod] || 0) + val;
-    if (!periodo && row[periodoKey] && String(row[periodoKey]).trim()) periodo = String(row[periodoKey]).trim();
-  }
-
-  fatTotal = Object.values(fatMap).filter(v => v > 0).reduce((s, v) => s + v, 0);
-  state.fatMap = fatMap; state.fatTotal = fatTotal; state.fatPeriodo = periodo;
-
-  document.getElementById('status-dot-fat').className  = 'status-dot active';
-  document.getElementById('status-text-fat').textContent = Object.keys(fatMap).length + ' clientes';
-  document.getElementById('nav-status-fat').style.display = 'inline';
-
-  document.getElementById('utitle-fat-done').textContent = filename;
-  document.getElementById('usub-fat-done').textContent =
-    Object.keys(fatMap).length + ' clientes · Total: ' + fmtBRL(fatTotal) + (periodo ? ' · ' + periodo : '');
-
-  document.getElementById('sumf-filename').textContent = filename;
-  document.getElementById('sumf-periodo').textContent  = periodo || '—';
-  document.getElementById('sumf-clientes').textContent = Object.keys(fatMap).length.toLocaleString('pt-BR');
-  document.getElementById('sumf-total').textContent    = fmtBRL(fatTotal);
-  document.getElementById('summary-fat').style.display = 'block';
-}
 
 // ---------- FILTROS ----------
 function populateStateFilter() {
@@ -791,9 +793,16 @@ function renderDashboard() {
   const criticos  = rows.filter(r => r.dias > 90).reduce((s, r) => s + r.valor, 0);
   const nClientes = new Set(vencidos.map(r => r.cliente)).size;
   const maxDias   = rows.reduce((mx, r) => Math.max(mx, r.dias), 0);
-  const pctFat    = hasFat ? (totalVenc / state.fatTotal * 100) : null;
+  const pctFatMes  = state.fatMes  > 0 ? (totalVenc / state.fatMes  * 100) : null;
+  const pctFatAcum = state.fatAcum > 0 ? (totalVenc / state.fatAcum * 100) : null;
+  const pctFat     = pctFatMes ?? pctFatAcum;
 
-  if (hasFat && state.fatPeriodo) document.getElementById('dash-period-label').textContent = `Inadimplência vs faturamento · Período: ${state.fatPeriodo}`;
+  if (hasFat) {
+    const parts = [];
+    if (state.fatMes  > 0) parts.push('Mês: ' + fmtBRL(state.fatMes));
+    if (state.fatAcum > 0) parts.push('Acumulado: ' + fmtBRL(state.fatAcum));
+    document.getElementById('dash-period-label').textContent = 'Faturamento informado — ' + parts.join(' · ');
+  }
 
   document.getElementById('metrics-grid').innerHTML = `
     <div class="metric-card">
@@ -842,9 +851,10 @@ function renderDashboard() {
 }
 
 function renderFatIndicators(totalVenc, criticos, rows) {
-  const fat = state.fatTotal;
-  const pctTotal = totalVenc / fat * 100;
-  const pctCrit  = criticos  / fat * 100;
+  const fat = state.fatMes || state.fatAcum;
+  const pctTotal = fat > 0 ? totalVenc / fat * 100 : 0;
+  const pctCrit  = fat > 0 ? criticos  / fat * 100 : 0;
+  const fatLabel = state.fatMes > 0 ? 'Fat. Mês' : 'Fat. Acumulado';
 
   const inadByClient = {};
   rows.filter(r => r.dias > 0).forEach(r => { inadByClient[r.cliente] = (inadByClient[r.cliente]||0) + r.valor; });
@@ -856,7 +866,7 @@ function renderFatIndicators(totalVenc, criticos, rows) {
 
   document.getElementById('fat-cards').innerHTML = `
     <div class="fat-card">
-      <div class="fat-card-label">Inadimplência total ÷ faturamento</div>
+      <div class="fat-card-label">Inadimplência total ÷ \${fatLabel}</div>
       <div class="fat-card-bar-wrap"><div class="fat-card-bar" style="width:${Math.min(pctTotal,100)}%;background:${pctTotal>=10?'#dc2626':pctTotal>=5?'#d97706':'#16a34a'}"></div></div>
       <div class="fat-card-values">
         <span class="fat-pct ${pctTotal>=10?'danger':pctTotal>=5?'warning':'success'}">${fmtPct(pctTotal)}</span>
@@ -864,7 +874,7 @@ function renderFatIndicators(totalVenc, criticos, rows) {
       </div>
     </div>
     <div class="fat-card">
-      <div class="fat-card-label">Crítico (+90 dias) ÷ faturamento</div>
+      <div class="fat-card-label">Crítico (+90 dias) ÷ ${fatLabel}</div>
       <div class="fat-card-bar-wrap"><div class="fat-card-bar" style="width:${Math.min(pctCrit,100)}%;background:${pctCrit>=5?'#dc2626':'#d97706'}"></div></div>
       <div class="fat-card-values">
         <span class="fat-pct ${pctCrit>=5?'danger':'warning'}">${fmtPct(pctCrit)}</span>
@@ -944,7 +954,7 @@ function renderTop() {
   const count=parseInt(document.getElementById('top-count').value)||20;
   const soloVenc=document.getElementById('top-vencidos-only').checked;
   const source=soloVenc?state.rows.filter(r=>r.dias>0):state.rows;
-  const hasFat=state.fatTotal>0;
+  const hasFat=false; // sem faturamento por cliente
   const by={};
   source.forEach(r=>{if(!by[r.cliente])by[r.cliente]={nome:r.nome,uf:r.uf,total:0,count:0,maxDias:0};by[r.cliente].total+=r.valor;by[r.cliente].count++;by[r.cliente].maxDias=Math.max(by[r.cliente].maxDias,r.dias);});
   const top=Object.entries(by).sort((a,b)=>b[1].total-a[1].total).slice(0,count);
@@ -973,7 +983,7 @@ function renderStateView() {
 function exportCSV() {
   const rows=state.filtered.length?state.filtered:state.rows;
   if(!rows.length){alert('Nenhum dado para exportar.');return;}
-  const hasFat=state.fatTotal>0;
+  const hasFat=false; // sem faturamento por cliente
   const header=['Cód. Cliente','Razão Social','UF','Documento','Dt. Vencimento','Dias Atraso','Faixa','Valor (R$)','Fat. Cliente (R$)','% Fat. Cliente','Status','Observação'];
   const lines=[header.join(';'),...rows.map(r=>{
     const fatC=hasFat?(state.fatMap[r.cliente]||0):'';
